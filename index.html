@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMAN // EUDAIMONIA</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Tenor+Sans&family=Inter:wght@100;300;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --crimson: #910000;
+            --rose: #ff1f4b;
+            --obsidian: #030303;
+            --text-main: #ffffff;
+        }
+
+        body {
+            background: var(--obsidian);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.9) 100%);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        #canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+        }
+
+        #stage {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            text-align: center;
+            width: 90%;
+            transition: opacity 1.2s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .letter-hero {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(10rem, 35vw, 22rem);
+            font-weight: 900;
+            line-height: 0.8;
+            margin-bottom: 2rem;
+            background: linear-gradient(to bottom, #fff 40%, var(--rose));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.05em;
+            filter: drop-shadow(0 0 40px rgba(255, 31, 75, 0.3));
+            transform: translateY(30px) scale(0.9);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide.active .letter-hero {
+            transform: translateY(0) scale(1);
+        }
+
+        .term {
+            font-family: 'Tenor Sans', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 0.8em;
+            text-transform: uppercase;
+            color: var(--rose);
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s 0.4s ease;
+        }
+
+        .meaning {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            opacity: 0;
+            max-width: 300px;
+            line-height: 1.6;
+            transition: all 1s 0.6s ease;
+        }
+
+        .slide.active .term, .slide.active .meaning {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .final-reveal {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            background: linear-gradient(45deg, #fff, var(--rose), #fff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: move-bg 6s linear infinite;
+        }
+
+        @keyframes move-bg {
+            to { background-position: 200% center; }
+        }
+
+        /* Controls */
+        .navigation {
+            position: fixed;
+            bottom: 80px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .ascend-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 31, 75, 0.4);
+            color: #fff;
+            padding: 18px 60px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 0.7rem;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .ascend-btn:hover {
+            background: var(--rose);
+            border-color: var(--rose);
+            letter-spacing: 0.8em;
+            box-shadow: 0 0 50px rgba(255, 31, 75, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .counter {
+            margin-top: 25px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: 0.6s;
+        }
+
+        .dot.active {
+            background: var(--rose);
+            border-color: var(--rose);
+            box-shadow: 0 0 15px var(--rose);
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="vignette"></div>
+    <canvas id="canvas"></canvas>
+
+    <div id="stage">
+        <!-- A -->
+        <div class="slide active">
+            <h1 class="letter-hero">A</h1>
+            <p class="term">Auspicious</p>
+            <p class="meaning">A sign that success and fortune will follow her everywhere</p>
+        </div>
+        <!-- I -->
+        <div class="slide">
+            <h1 class="letter-hero">I</h1>
+            <p class="term">Innate</p>
+            <p class="meaning">Possessing a natural power to achieve the impossible</p>
+        </div>
+        <!-- M -->
+        <div class="slide">
+            <h1 class="letter-hero">M</h1>
+            <p class="term">Maktub</p>
+            <p class="meaning">Her greatness is already written in the stars</p>
+        </div>
+        <!-- A -->
+        <div class="slide">
+            <h1 class="letter-hero">A</h1>
+            <p class="term">Ascendant</p>
+            <p class="meaning">Rising toward a future of unmatched legacy</p>
+        </div>
+        <!-- N -->
+        <div class="slide">
+            <h1 class="letter-hero">N</h1>
+            <p class="term">Numinous</p>
+            <p class="meaning">A blessed spirit that brings divine luck to those around her</p>
+        </div>
+        <!-- FINAL -->
+        <div class="slide">
+            <h1 class="final-reveal">AIMAN</h1>
+            <p class="term" style="color: #fff; opacity: 0.6; margin-top: 20px;">The harbinger of light</p>
+            <p class="meaning">Everything she touches turns to gold</p>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="ascend-btn" id="ascend-trigger">Ascend</button>
+        <div class="counter" id="counter"></div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const trigger = document.getElementById('ascend-trigger');
+        const counter = document.getElementById('counter');
+        let current = 0;
+
+        slides.forEach((_, i) => {
+            const d = document.createElement('div');
+            d.className = `dot ${i === 0 ? 'active' : ''}`;
+            counter.appendChild(d);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        trigger.addEventListener('click', () => {
+            slides[current].classList.remove('active');
+            dots[current].classList.remove('active');
+            
+            current = (current + 1) % slides.length;
+            
+            slides[current].classList.add('active');
+            dots[current].classList.add('active');
+
+            if(current === slides.length - 1) {
+                trigger.innerText = "Re-Ascend";
+            } else {
+                trigger.innerText = "Ascend";
+            }
+            
+            burstHearts();
+        });
+
+        // Fluid Particle Hearts
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let hearts = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, manual = false) {
+                this.x = x || Math.random() * canvas.width;
+                this.y = y || canvas.height + 20;
+                this.size = Math.random() * (manual ? 25 : 12) + 4;
+                this.speedY = -(Math.random() * 2 + 0.5);
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.life = 1;
+                this.decay = Math.random() * 0.006 + 0.002;
+                this.color = Math.random() > 0.5 ? '#910000' : '#ff1f4b';
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.life -= this.decay;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.translate(this.x, this.y);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(-this.size, -this.size, -this.size*2, this.size/2, 0, this.size*1.5);
+                ctx.bezierCurveTo(this.size*2, this.size/2, this.size, -this.size, 0, 0);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function burstHearts() {
+            for(let i = 0; i < 20; i++) {
+                hearts.push(new Particle(window.innerWidth/2, window.innerHeight/2, true));
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if(Math.random() < 0.1) hearts.push(new Particle());
+            hearts = hearts.filter(h => h.life > 0);
+            hearts.forEach(h => { h.update(); h.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
